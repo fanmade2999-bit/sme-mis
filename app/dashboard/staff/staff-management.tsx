@@ -16,7 +16,6 @@ type StaffRow = {
 
 export function StaffManagement({ initialStaff }: { initialStaff: StaffRow[] }) {
   const router = useRouter();
-  const supabase = createClient();
   const [staff, setStaff] = useState(initialStaff);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
@@ -27,6 +26,7 @@ export function StaffManagement({ initialStaff }: { initialStaff: StaffRow[] }) 
 
   async function invite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const supabase = createClient();
     setError("");
     setMessage("");
     setLoading(true);
@@ -57,6 +57,7 @@ export function StaffManagement({ initialStaff }: { initialStaff: StaffRow[] }) 
   }
 
   async function changeRole(accountId: string, nextRole: Role) {
+    const supabase = createClient();
     setError("");
     const { error: rpcError } = await supabase.rpc("change_staff_role", {
       p_account_id: accountId,
@@ -75,6 +76,7 @@ export function StaffManagement({ initialStaff }: { initialStaff: StaffRow[] }) 
   }
 
   async function revoke(accountId: string) {
+    const supabase = createClient();
     setError("");
     const { error: rpcError } = await supabase.rpc("revoke_staff_account", {
       p_account_id: accountId,
