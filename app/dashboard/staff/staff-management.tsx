@@ -125,6 +125,13 @@ export function StaffManagement({
   }
 
   async function revoke(accountId: string) {
+    const target = staff.find((row) => row.account_id === accountId);
+    if (!target) return;
+    const targetName = formatName(target);
+    if (!window.confirm(`Revoke access for ${targetName}? They will no longer be able to access this SME workspace until restored.`)) {
+      return;
+    }
+
     const supabase = createClient();
     setError("");
     setMessage("");
