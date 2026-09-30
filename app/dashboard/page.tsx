@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signOut } from "./actions";
 import { getCurrentStaffAccount } from "@/lib/mis/current-user";
@@ -123,11 +124,11 @@ export default async function DashboardPage() {
             <h2 className="mt-1 text-lg font-semibold">Manage staff</h2>
             <p className="mt-2 text-sm text-slate-500">Owner-only invitations, role changes, and revocation.</p>
           </a>
-          <a href="/" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
+          <Link href="/" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Public</p>
             <h2 className="mt-1 text-lg font-semibold">Public price layer</h2>
             <p className="mt-2 text-sm text-slate-500">Reserved for the public comparison experience.</p>
-          </a>
+          </Link>
         </section>
       </div>
     </main>
