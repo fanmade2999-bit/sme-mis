@@ -4,10 +4,10 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
+export default function SetupPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [businessName, setBusinessName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -17,13 +17,13 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
+    const { error: bootstrapError } = await supabase.rpc("bootstrap_sme_owner", {
+      p_business_name: businessName.trim(),
+      p_full_name: fullName.trim(),
     });
 
-    if (signInError) {
-      setError(signInError.message);
+    if (bootstrapError) {
+      setError(bootstrapError.message);
       setLoading(false);
       return;
     }
@@ -37,29 +37,29 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
         <div>
           <p className="text-sm font-medium text-emerald-400">SME MIS</p>
-          <h1 className="mt-2 text-3xl font-semibold">Sign in</h1>
-          <p className="mt-2 text-sm text-slate-400">Access your SME workspace.</p>
+          <h1 className="mt-2 text-3xl font-semibold">Set up your SME</h1>
+          <p className="mt-2 text-sm text-slate-400">Your authenticated account becomes the first Owner.</p>
         </div>
 
         <label className="block space-y-2">
-          <span className="text-sm font-medium">Email</span>
+          <span className="text-sm font-medium">Owner name</span>
           <input
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            type="email"
-            autoComplete="email"
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+            type="text"
+            autoComplete="name"
             required
             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
           />
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm font-medium">Password</span>
+          <span className="text-sm font-medium">Business name</span>
           <input
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            type="password"
-            autoComplete="current-password"
+            value={businessName}
+            onChange={(event) => setBusinessName(event.target.value)}
+            type="text"
+            autoComplete="organization"
             required
             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
           />
@@ -70,14 +70,10 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Setting up..." : "Create SME workspace"}
         </button>
-
-        <p className="text-sm text-slate-400">
-          New owner? <a className="text-emerald-400 hover:underline" href="/auth/register">Create an account</a>
-        </p>
       </form>
     </main>
   );

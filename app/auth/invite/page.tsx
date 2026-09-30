@@ -4,10 +4,10 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
+export default function InviteAcceptancePage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -15,15 +15,22 @@ export default function LoginPage() {
     event.preventDefault();
     const supabase = createClient();
     setError("");
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirm) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
+    const { error: updateError } = await supabase.auth.updateUser({ password });
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
-
-    if (signInError) {
-      setError(signInError.message);
+    if (updateError) {
+      setError(updateError.message);
       setLoading(false);
       return;
     }
@@ -37,29 +44,31 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
         <div>
           <p className="text-sm font-medium text-emerald-400">SME MIS</p>
-          <h1 className="mt-2 text-3xl font-semibold">Sign in</h1>
-          <p className="mt-2 text-sm text-slate-400">Access your SME workspace.</p>
+          <h1 className="mt-2 text-3xl font-semibold">Finish your invitation</h1>
+          <p className="mt-2 text-sm text-slate-400">Set a password for your invited SME account.</p>
         </div>
 
         <label className="block space-y-2">
-          <span className="text-sm font-medium">Email</span>
+          <span className="text-sm font-medium">New password</span>
           <input
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            type="email"
-            autoComplete="email"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            type="password"
+            minLength={8}
+            autoComplete="new-password"
             required
             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
           />
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm font-medium">Password</span>
+          <span className="text-sm font-medium">Confirm password</span>
           <input
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            value={confirm}
+            onChange={(event) => setConfirm(event.target.value)}
             type="password"
-            autoComplete="current-password"
+            minLength={8}
+            autoComplete="new-password"
             required
             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
           />
@@ -70,14 +79,10 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
         >
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Saving..." : "Set password"}
         </button>
-
-        <p className="text-sm text-slate-400">
-          New owner? <a className="text-emerald-400 hover:underline" href="/auth/register">Create an account</a>
-        </p>
       </form>
     </main>
   );
