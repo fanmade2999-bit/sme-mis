@@ -65,17 +65,9 @@ jobs:
             echo "::warning::VERCEL_TOKEN is not configured; production deployment will be skipped."
           fi
 
-      - name: Link Vercel project
-        if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 link --yes --project="$VERCEL_PROJECT_ID" --scope="fanmade1" --token="$VERCEL_TOKEN"
-
-      - name: Pull Vercel production environment
-        if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 pull --yes --environment=production --token="$VERCEL_TOKEN"
-
       - name: Reproduce Vercel build in CI
         if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 build --prod --token="$VERCEL_TOKEN"
+        run: npx --yes vercel@58.4.4 build --prod --token="$VERCEL_TOKEN" --project="$VERCEL_PROJECT_ID"
 
       - name: Deploy prebuilt artifact
         if: steps.credential.outputs.configured == 'true'
