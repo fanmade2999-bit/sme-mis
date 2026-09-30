@@ -9,9 +9,8 @@ on:
       - main
 
 concurrency:
-  group: sme-mis-ci-${{ github.ref }}
+  group: sme-mis-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
 concurrency:
   group: sme-mis-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
