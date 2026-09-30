@@ -55,12 +55,22 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (needsAuth && userId) {
-    const { data: account } = await supabase
+    const { data: account, error: accountError } = await supabase
       .from("staff_account")
       .select("account_id")
       .eq("auth_user_id", userId)
       .eq("is_active", true)
       .maybeSingle();
+
+    if (accountError) {
+      console.error("[auth-proxy] staff account lookup failed", {
+        code: accountError.code,
+        message: accountError.message,
+        userId,
+        pathname,
+      });
+      return markAuthResponse(response);
+    }
 
     if (pathname.startsWith("/dashboard") && !account) {
       return redirectWithSession(request, response, "/setup");
