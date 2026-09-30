@@ -17,6 +17,12 @@ begin
   if to_regprocedure('public.create_item(uuid,uuid,numeric,numeric,integer,text,text,text,boolean,integer)') is null then
     raise exception 'Atomic create_item contract is missing';
   end if;
+  if to_regprocedure('public.create_catalog_item(text,text,text,numeric,text,text,text,uuid,numeric,numeric,integer,text,text,text,boolean,integer)') is null then
+    raise exception 'Atomic catalog item contract is missing';
+  end if;
+  if pg_get_function_result(to_regprocedure('public.create_catalog_item(text,text,text,numeric,text,text,text,uuid,numeric,numeric,integer,text,text,text,boolean,integer)')) <> 'jsonb' then
+    raise exception 'Catalog item contract must return safe jsonb';
+  end if;
   if to_regprocedure('public.bootstrap_sme_owner(text,text)') is null then
     raise exception 'Owner bootstrap contract is missing';
   end if;
