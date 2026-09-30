@@ -1660,7 +1660,9 @@ RLS answers:
 
 Both must be designed.
 
-The staff_account grants were explicitly updated so the authenticated role can read the normalized name fields and required membership data.
+The staff_account grants were explicitly narrowed so the authenticated role can read only the normalized name fields and safe membership fields. auth_user_id remains unreadable through the Data API.
+
+The server resolves the current authenticated account through the read-only get_current_staff_account() RPC, which uses the private auth.uid()-based helper internally and returns no auth_user_id.
 
 ## 45.1 Least-privilege grants
 
@@ -2754,6 +2756,8 @@ Confirmed Supabase migration versions include:
 - 20260930212223 remove_direct_mutation_grants
 - 20260930212428 secure_item_public_visibility
 - 20261001090000 harden_product_identity_and_revoke_owner_guard
+- 20261001093000 safe_current_staff_membership_lookup
+- 20261001094500 restrict_current_staff_lookup
 
 The 20261001090000 hardening migration:
 - makes the database derive the canonical Product identity from normalized product attributes;
@@ -2761,6 +2765,11 @@ The 20261001090000 hardening migration:
 - rejects barcode/canonical-identity conflicts instead of silently reusing the barcode's Product;
 - normalizes existing Product canonical keys to the barcode-independent format;
 - prevents Owner accounts from being revoked by the staff-revocation RPC.
+
+The 20261001093000 and 20261001094500 migrations:
+- provide the application with a safe current-staff read path without granting authenticated users SELECT on auth_user_id;
+- keep the current-staff lookup function SECURITY INVOKER;
+- allow execution only for authenticated users, with anonymous execution explicitly revoked.
 
 One historical caveat remains:
 
