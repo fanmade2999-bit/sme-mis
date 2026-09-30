@@ -57,6 +57,7 @@ This is the implementation contract. Check items only after code and automated/l
 - [ ] TypeScript typecheck passes.
 - [ ] Automated tests pass.
 - [ ] Production build passes.
+- [ ] Vercel preview build parity passes when the deployment credential is available.
 - [ ] GitHub Actions runs verification on pushes/PRs.
 - [ ] `main` requires the verification CI check before merge; production deployment occurs only from the merged `main` commit.
 - [ ] Production commit is verified before reporting deployment status.
