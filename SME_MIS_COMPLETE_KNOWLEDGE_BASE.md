@@ -659,11 +659,14 @@ Each SME's Item keeps its own:
 
 # 15. Product matching
 
-Matching order:
+Product identity is authoritative from standardized attributes:
 
-1. Exact barcode, if available.
-2. Exact normalized canonical key.
-3. Future fuzzy suggestions may exist, but must never silently merge identities.
+1. Exact normalized canonical identity derived from brand, product name, variant, package size, and package unit.
+2. Barcode is an exact identifier attached to that identity and may be added later.
+3. If a supplied barcode already belongs to a different canonical identity, the operation is rejected rather than silently remapping the item.
+4. Future fuzzy suggestions may exist, but must never silently merge identities.
+
+The client-provided canonical-key field remains only for RPC compatibility; the database derives the authoritative canonical key itself.
 
 Canonical identity is based on standardized product characteristics such as:
 
@@ -1380,12 +1383,12 @@ Function:
 Current live state:
 
 - status: ACTIVE;
-- version: 4;
+- version: 5;
 - browser CORS support;
 - explicit authenticated-token validation;
-- gateway verify_jwt disabled;
-- user-scoped Supabase client used for actor lookup;
-- privileged admin client used for Auth administration;
+- gateway verify_jwt disabled because the function validates the bearer token itself;
+- authenticated publishable-key access is used for token validation only;
+- privileged admin client is used for actor membership lookup and Auth administration;
 - structured error responses.
 
 High-level process:
@@ -1425,8 +1428,9 @@ The new implementation:
 
 - handles browser CORS;
 - performs explicit auth validation;
-- returns readable server-side errors;
+- uses the service-role client for the actor lookup because auth_user_id is intentionally unavailable to the authenticated Data API role;
 - keeps privileged Auth operations in the admin client;
+- returns readable server-side errors;
 - detects previously revoked accounts.
 
 The Owner UI now also attempts to extract a useful error from the function response.
@@ -2859,8 +2863,10 @@ Examples:
 
 ## Product identity
 
-- exact barcode matches existing Product;
-- exact canonical key matches Product;
+- canonical identity is derived from standardized product attributes;
+- adding a barcode later does not create a second Product identity;
+- an exact barcode may only resolve to the same canonical Product identity;
+- barcode/canonical conflicts are rejected;
 - distinct size/variant stays distinct;
 - fuzzy similarity never silently merges.
 
