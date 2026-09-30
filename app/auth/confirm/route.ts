@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
 
-  if (!tokenHash || type !== "email") {
+  if (!tokenHash || (type !== "email" && type !== "invite")) {
     return NextResponse.redirect(new URL("/auth/error", origin));
   }
 
@@ -21,5 +21,5 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/auth/error", origin));
   }
 
-  return NextResponse.redirect(new URL("/setup", origin));
+  return NextResponse.redirect(new URL(type === "invite" ? "/auth/invite" : "/setup", origin));
 }
