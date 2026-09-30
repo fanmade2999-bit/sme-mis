@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { signOut } from "./actions";
+import { setPublicListingEnabled, signOut } from "./actions";
 import { getCurrentStaffAccount } from "@/lib/mis/current-user";
 import { createClient } from "@/lib/supabase/server";
 
@@ -36,7 +36,7 @@ export default async function DashboardPage() {
       .eq("sme_id", account.sme_id),
     supabase
       .from("sme")
-      .select("business_name")
+      .select("business_name,public_listing_enabled")
       .eq("sme_id", account.sme_id)
       .single(),
   ]);
@@ -134,12 +134,37 @@ export default async function DashboardPage() {
               <p className="mt-2 text-sm text-slate-500">Owner-only invitations, role changes, and revocation.</p>
             </a>
           ) : null}
-          <Link href="/" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
+          <Link href="/prices" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Public</p>
             <h2 className="mt-1 text-lg font-semibold">Public price layer</h2>
-            <p className="mt-2 text-sm text-slate-500">Reserved for the public comparison experience.</p>
+            <p className="mt-2 text-sm text-slate-500">Open the public comparison experience.</p>
           </Link>
         </section>
+
+        {account.role === "OWNER" ? (
+          <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Public listing</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  {smeResult.data.public_listing_enabled
+                    ? "Your active public items are currently available in the public price comparison."
+                    : "Your SME is currently hidden from the public price comparison."}
+                </p>
+              </div>
+              <form action={setPublicListingEnabled}>
+                <input
+                  type="hidden"
+                  name="enabled"
+                  value={smeResult.data.public_listing_enabled ? "false" : "true"}
+                />
+                <button className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">
+                  {smeResult.data.public_listing_enabled ? "Hide from public" : "Publish public prices"}
+                </button>
+              </form>
+            </div>
+          </section>
+        ) : null}
       </div>
     </main>
   );
