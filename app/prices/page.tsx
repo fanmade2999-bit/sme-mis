@@ -16,6 +16,7 @@ type PriceRow = {
   public_min_price: number;
   public_max_price: number;
   public_listing_count: number;
+  price_updated_at: string;
 };
 
 function money(value: number) {
@@ -36,7 +37,7 @@ export default async function PublicPricesPage({
 
   const result = await supabase
     .from("v_public_price_position")
-    .select("product_id,brand,product_name,variant,package_size_value,package_size_unit,sme_id,business_name,current_price,public_min_price,public_max_price,public_listing_count")
+    .select("product_id,brand,product_name,variant,package_size_value,package_size_unit,sme_id,business_name,current_price,price_updated_at,public_min_price,public_max_price,public_listing_count")
     .ilike("product_name", "%" + query + "%")
     .order("product_name")
     .order("current_price");
@@ -85,6 +86,9 @@ export default async function PublicPricesPage({
                   <p>Public range</p>
                   <p className="mt-1">{money(Number(row.public_min_price))} – {money(Number(row.public_max_price))}</p>
                   <p className="mt-1 text-xs text-slate-500">{Number(row.public_listing_count)} published listing{Number(row.public_listing_count) === 1 ? "" : "s"}</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Updated {new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short" }).format(new Date(row.price_updated_at))}
+                  </p>
                 </div>
               </article>
             ))}
