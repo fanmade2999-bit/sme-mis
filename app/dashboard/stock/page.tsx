@@ -39,7 +39,7 @@ export default async function StockPage() {
           <div>
             <p className="text-sm font-medium text-emerald-400">SME MIS</p>
             <h1 className="mt-1 text-2xl font-semibold">Stock control</h1>
-            <p className="mt-2 text-sm text-slate-400">Every stock change is recorded with its staff actor.</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Use Stock Control whenever inventory changes. A movement records what happened, who recorded it, when it happened, and the resulting stock quantity. Sales reduce stock; restocks increase it; losses/spoilage record deductions; corrections fix count discrepancies.</p>
           </div>
           <a href="/dashboard" className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">Back to workspace</a>
         </header>
