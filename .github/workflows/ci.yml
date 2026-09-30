@@ -27,23 +27,33 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
       - name: Lint
         run: npm run lint
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
       - name: Production build
         run: npm run build
 
-  deploy-production:
+      - name: Verification summary
+        if: always()
+        run: |
+          echo "Verification workflow completed."
+          echo "Production deployment is handled by the Vercel Git integration after an approved merge to main."
+
+  vercel-build-parity:
     needs: verify
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: team_xDSSktmv9l86xjqPlVRQFmll
-      VERCEL_PROJECT_ID: prj_K7YnFLEs6hKQ8seRjq5zywhslWIn
 
     steps:
       - name: Checkout
@@ -54,7 +64,7 @@ jobs:
         with:
           node-version: 24
 
-      - name: Check deployment credential
+      - name: Check Vercel credential
         id: credential
         shell: bash
         run: |
@@ -62,17 +72,17 @@ jobs:
             echo "configured=true" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::VERCEL_TOKEN is not configured; production deployment will be skipped."
+            echo "::warning::VERCEL_TOKEN is not configured; Vercel parity build will be skipped."
           fi
 
-      - name: Pull Vercel production settings
+      - name: Pull Vercel preview settings
         if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 pull --yes --environment=production --token="$VERCEL_TOKEN"
+        run: npx --yes vercel@58.4.4 pull --yes --environment=preview --token="$VERCEL_TOKEN"
 
-      - name: Reproduce Vercel build in CI
+      - name: Reproduce Vercel preview build
         if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 build --prod --token="$VERCEL_TOKEN"
+        run: npx --yes vercel@58.4.4 build --token="$VERCEL_TOKEN"
 
-      - name: Deploy prebuilt artifact
-        if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+      - name: Parity result
+        if: steps.credential.outputs.configured != 'true'
+        run: echo "Vercel parity build was not executed because VERCEL_TOKEN is unavailable."

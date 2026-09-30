@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SetupPage() {
@@ -11,6 +12,7 @@ export default function SetupPage() {
   const [businessName, setBusinessName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,7 +35,7 @@ export default function SetupPage() {
         return;
       }
 
-      window.location.assign("/dashboard");
+      router.push("/dashboard");
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Unable to complete SME setup.");
       setLoading(false);
