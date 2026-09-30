@@ -1,6 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const AUTH_CACHE_CONTROL = "private, no-cache, no-store, max-age=0, must-revalidate";
+
+function markAuthResponse(response: NextResponse) {
+  response.headers.set("Cache-Control", AUTH_CACHE_CONTROL);
+  response.headers.set("Vary", "Cookie");
+  return response;
+}
+
 function redirectWithSession(
   request: NextRequest,
   response: NextResponse,
@@ -12,7 +20,7 @@ function redirectWithSession(
     redirectResponse.cookies.set(cookie);
   }
 
-  return redirectResponse;
+  return markAuthResponse(redirectResponse);
 }
 
 export async function updateSession(request: NextRequest) {
@@ -63,5 +71,5 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  return response;
+  return needsAuth ? markAuthResponse(response) : response;
 }
