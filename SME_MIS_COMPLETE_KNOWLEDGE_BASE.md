@@ -2758,6 +2758,7 @@ Confirmed Supabase migration versions include:
 - 20260930213336 20261001090000_harden_product_identity_and_revoke_owner_guard
 - 20260930213554 20261001093000_safe_current_staff_membership_lookup
 - 20260930213629 20261001094500_restrict_current_staff_lookup
+- 20260930215000 harden_staff_reactivation_auth_link
 
 The 20261001090000 hardening migration:
 - makes the database derive the canonical Product identity from normalized product attributes;
@@ -2770,6 +2771,15 @@ The 20261001093000 and 20261001094500 migrations:
 - provide the application with a safe current-staff read path without granting authenticated users SELECT on auth_user_id;
 - keep the current-staff lookup function SECURITY INVOKER;
 - allow execution only for authenticated users, with anonymous execution explicitly revoked.
+
+The 20260930215000 hardening migration:
+- prevents restoration of a revoked staff record when its linked Supabase Auth user no longer exists;
+- keeps Owner-only restoration and same-SME/non-owner checks intact.
+
+Current live staff integrity check:
+- 1 active staff account;
+- 0 active accounts without a corresponding Auth user;
+- 0 revoked staff accounts in the current sample.
 
 One historical caveat remains:
 
