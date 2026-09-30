@@ -82,7 +82,11 @@ Deno.serve(async (req) => {
       return response({ error: "Authentication required" }, 401);
     }
 
-    const { data: actor, error: actorError } = await userClient
+    // The authenticated publishable-key client intentionally has no direct
+    // access to auth_user_id after least-privilege hardening. Use the
+    // service-role client for this server-side membership lookup instead.
+    const admin = createClient(supabaseUrl, secretKey);
+    const { data: actor, error: actorError } = await admin
       .from("staff_account")
       .select("account_id, sme_id, role, is_active")
       .eq("auth_user_id", user.id)
@@ -137,8 +141,6 @@ Deno.serve(async (req) => {
         400,
       );
     }
-
-    const admin = createClient(supabaseUrl, secretKey);
 
     // Page through Auth users so the duplicate-email check still works past 1000 accounts.
     const perPage = 1000;
