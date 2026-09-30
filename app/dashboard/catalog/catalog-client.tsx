@@ -90,8 +90,7 @@ export function CatalogClient({
   const [editingPrice, setEditingPrice] = useState("");
   const [priceSaving, setPriceSaving] = useState(false);
 
-  async function addCategory(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function addCategory() {
     const supabase = createClient();
     setError("");
     setMessage("");
@@ -116,8 +115,7 @@ export function CatalogClient({
     router.refresh();
   }
 
-  async function addLocation(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function addLocation() {
     const supabase = createClient();
     setError("");
     setMessage("");
@@ -447,7 +445,7 @@ export function CatalogClient({
                 {showCategoryCreate ? "Cancel" : "+ Create new category"}
               </button>
               {showCategoryCreate ? (
-                <form onSubmit={addCategory} className="mt-2 flex flex-col gap-2 sm:flex-row">
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                   <input
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
@@ -455,8 +453,8 @@ export function CatalogClient({
                     required
                     className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
                   />
-                  <button className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-950 hover:bg-white">Create</button>
-                </form>
+                  <button type="button" onClick={addCategory} className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-950 hover:bg-white">Create</button>
+                </div>
               ) : null}
             </div>
 
@@ -479,7 +477,7 @@ export function CatalogClient({
                 {showLocationCreate ? "Cancel" : "+ Create new shelf/location"}
               </button>
               {showLocationCreate ? (
-                <form onSubmit={addLocation} className="mt-2 flex flex-col gap-2 sm:flex-row">
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                   <input
                     value={newLocationName}
                     onChange={(e) => setNewLocationName(e.target.value)}
@@ -487,8 +485,8 @@ export function CatalogClient({
                     required
                     className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
                   />
-                  <button className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-950 hover:bg-white">Create</button>
-                </form>
+                  <button type="button" onClick={addLocation} className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-950 hover:bg-white">Create</button>
+                </div>
               ) : null}
             </div>
 
