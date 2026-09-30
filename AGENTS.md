@@ -51,7 +51,7 @@ A check that cannot run because the environment lacks credentials or dependencie
 Do not add unrelated UI/features while fixing infrastructure, security, or CI. Do not rewrite working architecture merely to satisfy a tool.
 
 ## Deployment model
-- GitHub Actions is verification-only: it runs lint, typecheck, tests, and the production build.
+- GitHub Actions is verification-only: it runs lint, typecheck, tests, the production build, and (when `VERCEL_TOKEN` is available) a Vercel preview build parity check.
 - Production deployment is handled by the Vercel Git integration after an approved merge to `main`.
 - Keep `main` protected so the verification check is required before merge; otherwise Vercel can deploy a manually merged failing commit.
 - Verify the deployed production commit SHA before claiming production is current.
