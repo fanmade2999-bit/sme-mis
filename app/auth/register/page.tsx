@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function RegisterPage() {
   const router = useRouter();
   const supabase = createClient();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,6 +23,9 @@ export default function RegisterPage() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.trim(),
       password,
+      options: {
+        data: { full_name: fullName.trim() },
+      },
     });
 
     if (signUpError) {
@@ -48,6 +52,18 @@ export default function RegisterPage() {
           <h1 className="mt-2 text-3xl font-semibold">Create owner account</h1>
           <p className="mt-2 text-sm text-slate-400">The first account can bootstrap one SME workspace.</p>
         </div>
+
+        <label className="block space-y-2">
+          <span className="text-sm font-medium">Full name</span>
+          <input
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+            type="text"
+            autoComplete="name"
+            required
+            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
+          />
+        </label>
 
         <label className="block space-y-2">
           <span className="text-sm font-medium">Email</span>
