@@ -36,7 +36,6 @@ export function CatalogClient({
   initialItems: Item[];
 }) {
   const router = useRouter();
-  const supabase = createClient();
   const [categories, setCategories] = useState(initialCategories);
   const [items, setItems] = useState(initialItems);
   const [categoryName, setCategoryName] = useState("");
@@ -62,6 +61,7 @@ export function CatalogClient({
 
   async function addCategory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const supabase = createClient();
     setError("");
     setMessage("");
 
@@ -87,6 +87,7 @@ export function CatalogClient({
   }
 
   async function changePrice(itemId: string) {
+    const supabase = createClient();
     setError("");
     setMessage("");
     setPriceSaving(true);
@@ -124,6 +125,7 @@ export function CatalogClient({
   }
 
   async function archive(itemId: string) {
+    const supabase = createClient();
     setError("");
     setMessage("");
 
@@ -147,6 +149,7 @@ export function CatalogClient({
 
   async function createItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const supabase = createClient();
     setError("");
     setMessage("");
     setCreating(true);
