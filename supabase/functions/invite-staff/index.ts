@@ -8,10 +8,11 @@ export default {
       return Response.json({ error: "Method not allowed" }, { status: 405 });
     }
 
+    const userId = ctx.userClaims?.sub;
     const { data: actor, error: actorError } = await ctx.supabase
       .from("staff_account")
       .select("account_id, sme_id, role, is_active")
-      .eq("auth_user_id", ctx.userClaims?.sub ?? "")
+      .eq("auth_user_id", userId ?? "")
       .maybeSingle();
 
     if (actorError || !actor || !actor.is_active) {
@@ -41,18 +42,30 @@ export default {
       );
     }
 
-    const { data: existingAccount, error: existingError } = await ctx.supabaseAdmin
-      .from("staff_account")
-      .select("account_id")
-      .eq("sme_id", actor.sme_id)
-      .limit(1)
-      .maybeSingle();
+    const { data: users, error: usersError } = await ctx.supabaseAdmin.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000,
+    });
 
-    if (existingError) {
-      return Response.json({ error: existingError.message }, { status: 500 });
+    if (usersError) {
+      return Response.json({ error: usersError.message }, { status: 500 });
     }
 
-    const redirectTo = new URL("/auth/confirm?type=invite", new URL(req.url).origin).toString();
+    const existingUser = users.users.find(
+      (user) => user.email?.toLowerCase() === email,
+    );
+
+    if (existingUser) {
+      return Response.json(
+        { error: "This email already has a Supabase Auth account. Use a different email for a new staff invitation." },
+        { status: 409 },
+      );
+    }
+
+    const redirectTo = new URL(
+      "/auth/confirm?type=invite",
+      new URL(req.url).origin,
+    ).toString();
 
     const { data: invited, error: inviteError } =
       await ctx.supabaseAdmin.auth.admin.inviteUserByEmail(email, {
