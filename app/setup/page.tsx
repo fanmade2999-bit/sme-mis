@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function SetupPage() {
   const router = useRouter();
   const supabase = createClient();
+  const [fullName, setFullName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ export default function SetupPage() {
 
     const { error: bootstrapError } = await supabase.rpc("bootstrap_sme_owner", {
       p_business_name: businessName.trim(),
+      p_full_name: fullName.trim(),
     });
 
     if (bootstrapError) {
@@ -38,6 +40,18 @@ export default function SetupPage() {
           <h1 className="mt-2 text-3xl font-semibold">Set up your SME</h1>
           <p className="mt-2 text-sm text-slate-400">Your authenticated account becomes the first Owner.</p>
         </div>
+
+        <label className="block space-y-2">
+          <span className="text-sm font-medium">Owner name</span>
+          <input
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+            type="text"
+            autoComplete="name"
+            required
+            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
+          />
+        </label>
 
         <label className="block space-y-2">
           <span className="text-sm font-medium">Business name</span>
