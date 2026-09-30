@@ -1,11 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SetupPage() {
-  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [error, setError] = useState("");
@@ -17,19 +15,25 @@ export default function SetupPage() {
     setError("");
     setLoading(true);
 
-    const { error: bootstrapError } = await supabase.rpc("bootstrap_sme_owner", {
-      p_business_name: businessName.trim(),
-      p_full_name: fullName.trim(),
-    });
+    try {
+      const { error: bootstrapError } = await supabase.rpc("bootstrap_sme_owner", {
+        p_business_name: businessName.trim(),
+        p_full_name: fullName.trim(),
+      });
 
-    if (bootstrapError) {
-      setError(bootstrapError.message);
+      if (bootstrapError) {
+        setError(bootstrapError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Force a fresh request so the auth/session proxy re-checks the newly
+      // created staff account instead of reusing the client router state.
+      window.location.assign("/dashboard");
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Unable to complete SME setup.");
       setLoading(false);
-      return;
     }
-
-    router.replace("/dashboard");
-    router.refresh();
   }
 
   return (
