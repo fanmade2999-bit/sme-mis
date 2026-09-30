@@ -26,7 +26,6 @@ export function StockMovementClient({
   initialItems: Item[];
 }) {
   const router = useRouter();
-  const supabase = createClient();
   const [items, setItems] = useState(initialItems);
   const [itemId, setItemId] = useState(initialItems[0]?.item_id ?? "");
   const [movement, setMovement] = useState<Movement>("SALE");
@@ -39,6 +38,7 @@ export function StockMovementClient({
 
   async function record(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const supabase = createClient();
     setError("");
     setMessage("");
     setLoading(true);
