@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next/navigation";
 import { getCurrentStaffAccount } from "@/lib/mis/current-user";
 import { createClient } from "@/lib/supabase/server";
