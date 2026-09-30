@@ -2755,9 +2755,9 @@ Confirmed Supabase migration versions include:
 - 20260930212011 secure_public_listing_setting
 - 20260930212223 remove_direct_mutation_grants
 - 20260930212428 secure_item_public_visibility
-- 20261001090000 harden_product_identity_and_revoke_owner_guard
-- 20261001093000 safe_current_staff_membership_lookup
-- 20261001094500 restrict_current_staff_lookup
+- 20260930213336 20261001090000_harden_product_identity_and_revoke_owner_guard
+- 20260930213554 20261001093000_safe_current_staff_membership_lookup
+- 20260930213629 20261001094500_restrict_current_staff_lookup
 
 The 20261001090000 hardening migration:
 - makes the database derive the canonical Product identity from normalized product attributes;
