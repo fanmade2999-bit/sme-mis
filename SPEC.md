@@ -58,5 +58,5 @@ This is the implementation contract. Check items only after code and automated/l
 - [ ] Automated tests pass.
 - [ ] Production build passes.
 - [ ] GitHub Actions runs verification on pushes/PRs.
-- [ ] Deployment only occurs after verification passes.
+- [ ] `main` requires the verification CI check before merge; production deployment occurs only from the merged `main` commit.
 - [ ] Production commit is verified before reporting deployment status.
