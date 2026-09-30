@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function InviteAcceptancePage() {
   const router = useRouter();
-  const supabase = createClient();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -14,6 +13,7 @@ export default function InviteAcceptancePage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const supabase = createClient();
     setError("");
 
     if (password.length < 8) {
