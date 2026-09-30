@@ -16,7 +16,7 @@
 7. Review the diff for correctness, security, tenant isolation, and test coverage.
 8. Resolve review comments and wait for all required checks to pass.
 9. Merge the approved pull request into `main`.
-10. Deploy production only from the resulting `main` commit.
+10. After merge, let the Vercel Git integration deploy the resulting `main` commit to production; do not create a second production deployment from CI.
 
 ## Pull-request rules
 
