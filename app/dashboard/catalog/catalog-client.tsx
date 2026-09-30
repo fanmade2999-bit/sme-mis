@@ -276,7 +276,9 @@ export function CatalogClient({
       return;
     }
 
-    const key = canonicalKey([barcode, brand, productName, variant, sizeValue, selectedSizeUnit]);
+    // Barcode is a separate exact identifier. Keep it out of the canonical key so
+    // adding a barcode later does not create a second Product identity.
+    const key = canonicalKey([brand, productName, variant, sizeValue, selectedSizeUnit]);
 
     const { data: item, error: itemError } = await supabase.rpc("create_catalog_item", {
       p_brand: brand.trim() || null,
