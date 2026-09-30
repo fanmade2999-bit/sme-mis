@@ -42,8 +42,22 @@ export async function getCurrentStaffAccount(): Promise<StaffAccountSummary | nu
 
   if (!data) return null;
 
+  // The RPC is intentionally exposed as a narrow application contract. Until
+  // generated Supabase types include the function result, keep the cast local
+  // to this boundary instead of weakening the rest of the module.
+  const account = data as {
+    account_id: string;
+    sme_id: string;
+    first_name: string;
+    middle_name: string | null;
+    last_name: string | null;
+    name_suffix: string | null;
+    role: "OWNER" | "MANAGER" | "STAFF";
+    is_active: boolean;
+  };
+
   return {
-    ...data,
-    full_name: formatStaffName(data),
-  } as StaffAccountSummary;
+    ...account,
+    full_name: formatStaffName(account),
+  };
 }
