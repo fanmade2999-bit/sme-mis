@@ -189,7 +189,7 @@ export function CatalogClient({
 
     const key = canonicalKey([barcode, brand, productName, variant, sizeValue, sizeUnit]);
 
-    const { data: productId, error: productError } = await supabase.rpc("ensure_product", {
+    const { data: item, error: itemError } = await supabase.rpc("create_catalog_item", {
       p_brand: brand.trim() || null,
       p_product_name: productName.trim(),
       p_variant: variant.trim() || null,
@@ -197,16 +197,6 @@ export function CatalogClient({
       p_package_size_unit: sizeUnit.trim() || null,
       p_barcode: barcode.trim() || null,
       p_canonical_key: key,
-    });
-
-    if (productError) {
-      setError(productError.message);
-      setCreating(false);
-      return;
-    }
-
-    const { data: item, error: itemError } = await supabase.rpc("create_item", {
-      p_product_id: productId,
       p_category_id: categoryId,
       p_current_price: currentPrice,
       p_cost: role === "OWNER" && cost.trim() ? Number(cost) : null,
