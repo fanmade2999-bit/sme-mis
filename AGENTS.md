@@ -27,7 +27,7 @@ SME MIS is a multi-tenant SME management information system built with Next.js A
 - Keep a branch scoped to one coherent change. Do not mix unrelated refactors or features.
 - Open a pull request into `main` when the branch is ready.
 - CI must pass before merge. Review the diff for behavior, security, tests, and scope before approving.
-- Merge only after approval and green required checks. Production deployment occurs from the resulting `main` commit.
+- Merge only after approval and green required checks. The `main` branch should require the CI verification check before merge; production deployment is then performed by Vercel's Git integration from the resulting `main` commit.
 - Do not force-push or rewrite shared history as part of ordinary feature work.
 
 ## Development loop
@@ -50,5 +50,8 @@ A check that cannot run because the environment lacks credentials or dependencie
 ## Scope discipline
 Do not add unrelated UI/features while fixing infrastructure, security, or CI. Do not rewrite working architecture merely to satisfy a tool.
 
-## Current known deployment constraint
-The repository's GitHub Actions workflow can deploy production through Vercel when `VERCEL_TOKEN` is configured. Production may lag behind `main`; verify the deployment commit before claiming production is current.
+## Deployment model
+- GitHub Actions is verification-only: it runs lint, typecheck, tests, and the production build.
+- Production deployment is handled by the Vercel Git integration after an approved merge to `main`.
+- Keep `main` protected so the verification check is required before merge; otherwise Vercel can deploy a manually merged failing commit.
+- Verify the deployed production commit SHA before claiming production is current.
