@@ -14,17 +14,37 @@ export async function updateSession(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) =>
-          request.cookies.set(name, value),
-        );
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
-        );
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
     },
   });
 
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims?.sub;
+  const pathname = request.nextUrl.pathname;
+  const needsAuth = pathname.startsWith("/dashboard") || pathname.startsWith("/setup");
+
+  if (needsAuth && !userId) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  if (needsAuth && userId) {
+    const { data: account } = await supabase
+      .from("staff_account")
+      .select("account_id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+
+    if (pathname.startsWith("/dashboard") && !account) {
+      return NextResponse.redirect(new URL("/setup", request.url));
+    }
+
+    if (pathname.startsWith("/setup") && account) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
   return response;
 }
