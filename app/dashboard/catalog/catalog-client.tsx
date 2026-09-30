@@ -194,7 +194,7 @@ export function CatalogClient({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(260px,360px)]">
+      {role !== "STAFF" ? <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(260px,360px)]">
         <form onSubmit={createItem} className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
           <h2 className="text-lg font-semibold">Add item</h2>
           <p className="mt-1 text-sm text-slate-400">Product identity is shared globally; the item listing belongs to this SME.</p>
@@ -235,7 +235,7 @@ export function CatalogClient({
             {categories.map((category) => <div key={category.category_id} className="rounded-lg bg-slate-950 px-3 py-2 text-sm text-slate-300">{category.category_name}</div>)}
           </div>
         </form>
-      </div>
+      </div> : null}
 
       <section className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
         <div className="border-b border-slate-800 p-6">
