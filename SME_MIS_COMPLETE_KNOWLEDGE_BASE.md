@@ -1503,7 +1503,7 @@ Live database still contains two signatures:
 - old two-argument bootstrap_sme_owner;
 - newer normalized five-argument bootstrap_sme_owner.
 
-The old one has execution revoked and should eventually be removed.
+The old two-argument overload has been removed from the live database.
 
 New code should call the five-argument version only.
 
@@ -1585,7 +1585,7 @@ UI hiding is not sufficient security.
 
 Authenticated users can select their current SME.
 
-Owner can update permitted SME settings.
+Owner can update permitted SME settings only through the guarded public-listing RPC in the current implementation.
 
 Public can read active public-participating SMEs.
 
@@ -1601,13 +1601,15 @@ Public/authenticated reads can see active product identity subject to policy.
 
 Authenticated users can read same-SME categories.
 
-Owner/Manager can create/update categories.
+Category creation is performed through a guarded Owner/Manager RPC. Direct authenticated category mutation grants are removed.
 
 ## ITEM
 
 Authenticated users can read same-SME items.
 
-Owner/Manager can insert/update allowed item states.
+Owner/Manager can insert items through guarded catalog RPCs and change public visibility through a guarded RPC.
+
+Direct authenticated item mutation grants have been removed; price, stock, cost, archive, and public-visibility mutations go through database functions.
 
 Public item reads require:
 
@@ -1702,6 +1704,8 @@ Current public read models:
 - v_public_price_comparison;
 - v_public_price_position.
 
+Owner controls whether the SME participates in the public layer, and Owner/Manager controls whether each active item is publicly visible.
+
 Public price position can provide:
 
 - minimum observed price;
@@ -1754,6 +1758,8 @@ Current behavior:
 - observed range;
 - listing count;
 - price freshness timestamp.
+
+The public comparison only becomes visible when both the SME-level public listing switch and item-level public visibility permit it.
 
 The page is configured to be dynamic so runtime Supabase data is not required during static build.
 
@@ -2537,7 +2543,7 @@ Confirmed production commit:
 
     3c28d114de4f1657480b137cef8e451165308e0b
 
-The latest GitHub commit after that deployment was not automatically deployed because Git integration deployment is intentionally disabled.
+Git integration deployment remains intentionally disabled. Production deployment is expected to occur from the GitHub Actions production job after the verify job succeeds.
 
 ---
 
