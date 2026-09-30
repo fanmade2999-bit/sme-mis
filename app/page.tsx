@@ -17,6 +17,9 @@ export default function Home() {
           <a href="/auth/register" className="rounded-lg border border-slate-700 px-4 py-2.5 font-medium hover:bg-slate-800">
             Create owner account
           </a>
+          <a href="/prices" className="rounded-lg border border-slate-700 px-4 py-2.5 font-medium hover:bg-slate-800">
+            Compare public prices
+          </a>
           <a href="/dashboard" className="rounded-lg border border-slate-700 px-4 py-2.5 font-medium hover:bg-slate-800">
             Open workspace
           </a>
