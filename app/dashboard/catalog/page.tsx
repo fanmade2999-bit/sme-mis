@@ -87,7 +87,6 @@ export default async function CatalogPage() {
         </header>
 
         <CatalogClient
-          smeId={account.sme_id}
           role={account.role}
           initialCategories={categories.data ?? []}
           initialLocations={locations.data ?? []}
