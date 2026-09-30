@@ -1,6 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function redirectWithSession(
+  request: NextRequest,
+  response: NextResponse,
+  path: string,
+) {
+  const redirectResponse = NextResponse.redirect(new URL(path, request.url));
+
+  for (const cookie of response.cookies.getAll()) {
+    redirectResponse.cookies.set(cookie);
+  }
+
+  return redirectResponse;
+}
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -16,7 +30,9 @@ export async function updateSession(request: NextRequest) {
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
   });
@@ -27,7 +43,7 @@ export async function updateSession(request: NextRequest) {
   const needsAuth = pathname.startsWith("/dashboard") || pathname.startsWith("/setup");
 
   if (needsAuth && !userId) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    return redirectWithSession(request, response, "/auth/login");
   }
 
   if (needsAuth && userId) {
@@ -38,11 +54,11 @@ export async function updateSession(request: NextRequest) {
       .maybeSingle();
 
     if (pathname.startsWith("/dashboard") && !account) {
-      return NextResponse.redirect(new URL("/setup", request.url));
+      return redirectWithSession(request, response, "/setup");
     }
 
     if (pathname.startsWith("/setup") && account) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return redirectWithSession(request, response, "/dashboard");
     }
   }
 
