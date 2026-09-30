@@ -2527,6 +2527,8 @@ This means:
 
 > A successful GitHub push or CI run does not automatically mean the newest commit is live on Vercel.
 
+As of the latest verification, production is confirmed through commit 534a22..., while subsequent hardening/public-visibility commits on main are not yet confirmed in production.
+
 ---
 
 # 81. Confirmed Vercel production deployment
@@ -2535,7 +2537,7 @@ Last confirmed production deployment:
 
 Deployment ID:
 
-    dpl_3TJnfxg2huutgJWBjEowq75SKXfQ
+    dpl_4R3PMJi3USAQuHsh3xGmCU7PRFim
 
 State:
 
@@ -2556,7 +2558,7 @@ Aliases:
 
 Confirmed production commit:
 
-    3c28d114de4f1657480b137cef8e451165308e0b
+    534a22dbf20a4d43d2e5b73adc9572e85fd1c187
 
 Git integration deployment remains intentionally disabled. Production deployment is expected to occur from the GitHub Actions production job after the verify job succeeds.
 
@@ -2571,7 +2573,8 @@ Therefore:
 - READY does not mean unauthenticated public access;
 - public browser requests may redirect to Vercel authentication;
 - do not claim unrestricted public availability;
-- app-level public price functionality and platform-level Vercel Authentication are separate concerns.
+- app-level public price functionality and platform-level Vercel Authentication are separate concerns;
+- because deployment protection is platform-level, the current production deployment cannot serve /prices as an unrestricted public page until Vercel Authentication is disabled or otherwise separated from the public deployment.
 
 ---
 
