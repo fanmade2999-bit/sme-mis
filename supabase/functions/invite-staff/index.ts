@@ -3,6 +3,10 @@ import { corsHeaders } from "jsr:@supabase/supabase-js@2/cors";
 
 type StaffRole = "MANAGER" | "STAFF";
 
+// Where invited users land after clicking the email link. Set the SITE_URL secret to
+// override; otherwise the production domain is used. Never derive this from the request.
+const DEFAULT_SITE_URL = "https://sme-mis.vercel.app";
+
 function response(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -20,6 +24,15 @@ function getDefaultKey(raw: string | undefined) {
     return parsed.default ?? null;
   } catch {
     return null;
+  }
+}
+
+function getSiteUrl() {
+  const raw = Deno.env.get("SITE_URL") ?? DEFAULT_SITE_URL;
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return DEFAULT_SITE_URL;
   }
 }
 
@@ -127,23 +140,27 @@ Deno.serve(async (req) => {
 
     const admin = createClient(supabaseUrl, secretKey);
 
-    const { data: users, error: usersError } =
-      await admin.auth.admin.listUsers({
-        page: 1,
-        perPage: 1000,
-      });
+    // Page through Auth users so the duplicate-email check still works past 1000 accounts.
+    const perPage = 1000;
+    let existingUser: { id: string; email?: string } | undefined;
+    for (let page = 1; page <= 20 && !existingUser; page++) {
+      const { data: users, error: usersError } =
+        await admin.auth.admin.listUsers({ page, perPage });
 
-    if (usersError) {
-      console.error("[invite-staff] auth user lookup failed", {
-        code: usersError.name,
-        message: usersError.message,
-      });
-      return response({ error: "Unable to check existing Auth accounts." }, 500);
+      if (usersError) {
+        console.error("[invite-staff] auth user lookup failed", {
+          code: usersError.name,
+          message: usersError.message,
+        });
+        return response({ error: "Unable to check existing Auth accounts." }, 500);
+      }
+
+      existingUser = users.users.find(
+        (candidate) => candidate.email?.toLowerCase() === email,
+      );
+
+      if (users.users.length < perPage) break;
     }
-
-    const existingUser = users.users.find(
-      (candidate) => candidate.email?.toLowerCase() === email,
-    );
 
     if (existingUser) {
       const { data: existingStaff, error: existingStaffError } = await admin
@@ -171,10 +188,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const redirectTo = new URL(
-      "/auth/confirm?type=invite",
-      new URL(req.url).origin,
-    ).toString();
+    const redirectTo = new URL("/auth/confirm?type=invite", getSiteUrl()).toString();
 
     const { data: invited, error: inviteError } =
       await admin.auth.admin.inviteUserByEmail(email, {
