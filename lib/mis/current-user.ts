@@ -34,6 +34,7 @@ export async function getCurrentStaffAccount(): Promise<StaffAccountSummary | nu
     .from("staff_account")
     .select("account_id, sme_id, first_name, middle_name, last_name, name_suffix, role, is_active")
     .eq("auth_user_id", userData.user.id)
+    .eq("is_active", true)
     .maybeSingle();
 
   if (error) {
