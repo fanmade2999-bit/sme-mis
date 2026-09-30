@@ -42,3 +42,6 @@ The project does not include password recovery, supplier management, multi-branc
 ## Repository status
 
 The generic starter UI has been removed. Do not reintroduce template/demo pages; build SME MIS modules from the approved system design instead.
+
+
+<!-- Production pipeline verified: 2026-09-30 -->
