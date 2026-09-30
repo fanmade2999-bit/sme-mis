@@ -2745,18 +2745,28 @@ Confirmed Supabase migration versions include:
 - 20260930191929 catalog_categories_and_locations
 - 20260930192112 secure_catalog_category_creation
 - 20260930192313 index_item_category_item_fk
+- 20260930202902 harden_owner_checks_and_drop_legacy_bootstrap
+- 20260930210747 harden_owner_checks_and_drop_legacy_bootstrap
+- 20260930211030 harden_reactivate_staff_owner_check
+- 20260930211319 normalize_staff_names_and_restore_access
+- 20260930211956 tighten_least_privilege_grants
+- 20260930212011 secure_public_listing_setting
+- 20260930212223 remove_direct_mutation_grants
+- 20260930212428 secure_item_public_visibility
+- 20261001090000 harden_product_identity_and_revoke_owner_guard
 
-The staff-name normalization and reactivation state has now been reconciled into live migration history as:
-
-    20260930211319_normalize_staff_names_and_restore_access
-
-The repository now carries that exact migration version, and the earlier unrecorded 20261001034500 normalization file was removed.
+The 20261001090000 hardening migration:
+- makes the database derive the canonical Product identity from normalized product attributes;
+- permits adding a barcode to an existing canonical Product without creating a second Product;
+- rejects barcode/canonical-identity conflicts instead of silently reusing the barcode's Product;
+- normalizes existing Product canonical keys to the barcode-independent format;
+- prevents Owner accounts from being revoked by the staff-revocation RPC.
 
 One historical caveat remains:
 
 - Supabase contains two entries named harden_owner_checks_and_drop_legacy_bootstrap:
   20260930202902 and 20260930210747.
-- The repository now contains the later applied version 20260930210747.
+- The repository contains the later applied version 20260930210747.
 - The exact original SQL for the earlier 20260930202902 entry was not recovered from repository history.
 
 The later hardening migration is idempotent, so the duplicate live application does not change the final function behavior.
