@@ -19,7 +19,7 @@ export default async function CatalogPage() {
       .order("category_name"),
     supabase
       .from("item")
-      .select("item_id,product_id,category_id,current_price,stock_qty,reorder_level,shelf_location,shelf_location_id,qr_code,status,product:product_id(product_name,brand)")
+      .select("item_id,product_id,category_id,current_price,stock_qty,reorder_level,shelf_location,shelf_location_id,qr_code,status,public_visible,product:product_id(product_name,brand)")
       .eq("sme_id", account.sme_id)
       .order("created_at", { ascending: false }),
     supabase
@@ -71,6 +71,7 @@ export default async function CatalogPage() {
       shelf_location_id: item.shelf_location_id,
       qr_code: item.qr_code,
       status: item.status,
+      public_visible: item.public_visible,
     };
   });
 
