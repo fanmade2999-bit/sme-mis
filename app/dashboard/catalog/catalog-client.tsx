@@ -22,6 +22,7 @@ type Item = {
   shelf_location_id: string | null;
   qr_code: string | null;
   status: "UNFINISHED" | "ACTIVE" | "ARCHIVED";
+  public_visible: boolean;
 };
 
 const SIZE_UNITS = [
@@ -83,12 +84,14 @@ export function CatalogClient({
   const [showLocationCreate, setShowLocationCreate] = useState(false);
 
   const [qrCode, setQrCode] = useState("");
+  const [publicVisible, setPublicVisible] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [creating, setCreating] = useState(false);
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
   const [editingPrice, setEditingPrice] = useState("");
   const [priceSaving, setPriceSaving] = useState(false);
+  const [visibilitySavingId, setVisibilitySavingId] = useState<string | null>(null);
 
   async function addCategory() {
     const supabase = createClient();
@@ -191,6 +194,35 @@ export function CatalogClient({
     setEditingPrice("");
     setMessage("Price updated and change logged.");
     setPriceSaving(false);
+    router.refresh();
+  }
+
+  async function setPublicVisibility(itemId: string, publicVisible: boolean) {
+    const supabase = createClient();
+    setError("");
+    setMessage("");
+    setVisibilitySavingId(itemId);
+
+    const { data, error: visibilityError } = await supabase.rpc("set_item_public_visibility", {
+      p_item_id: itemId,
+      p_public_visible: publicVisible,
+    });
+
+    if (visibilityError) {
+      setError(visibilityError.message);
+      setVisibilitySavingId(null);
+      return;
+    }
+
+    setItems((current) =>
+      current.map((item) =>
+        item.item_id === itemId
+          ? { ...item, public_visible: Boolean(data.public_visible) }
+          : item,
+      ),
+    );
+    setMessage(publicVisible ? "Item published to the public price layer." : "Item hidden from the public price layer.");
+    setVisibilitySavingId(null);
     router.refresh();
   }
 
@@ -297,7 +329,7 @@ export function CatalogClient({
       p_shelf_location_id: shelfLocationId || null,
       p_qr_code: qrCode.trim() || null,
       p_photo_path: null,
-      p_public_visible: true,
+      p_public_visible: publicVisible,
       p_initial_stock: parsedInitialStock,
     });
 
@@ -325,6 +357,7 @@ export function CatalogClient({
         shelf_location_id: item.shelf_location_id,
         qr_code: item.qr_code,
         status: item.status,
+        public_visible: Boolean(item.public_visible),
       },
       ...current,
     ]);
@@ -342,6 +375,7 @@ export function CatalogClient({
     setInitialStock("");
     setShelfLocationId("");
     setQrCode("");
+    setPublicVisible(true);
     setSelectedCategoryIds([]);
     setMessage("Item created.");
     setCreating(false);
@@ -504,6 +538,19 @@ export function CatalogClient({
               <span className="mt-1 block text-xs text-slate-500">Leave blank to start at 0; a positive amount is recorded as initial stock.</span>
             </label>
 
+            <label className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-950 p-3">
+              <input
+                type="checkbox"
+                checked={publicVisible}
+                onChange={(e) => setPublicVisible(e.target.checked)}
+                className="mt-1 h-4 w-4"
+              />
+              <span>
+                <span className="block text-sm font-medium">Visible in public price comparison</span>
+                <span className="mt-1 block text-xs text-slate-500">The SME still needs to enable Public Listing before anyone can see this item.</span>
+              </span>
+            </label>
+
             <label className="block">
               <span className="text-sm font-medium">QR code / binding <span className="font-normal text-slate-500">(optional)</span></span>
               <input value={qrCode} onChange={(e) => setQrCode(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
@@ -551,6 +598,20 @@ export function CatalogClient({
 
               <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
                 <span>{item.status}</span>
+                {item.status === "ACTIVE" && role !== "STAFF" ? (
+                  <button
+                    type="button"
+                    onClick={() => setPublicVisibility(item.item_id, !item.public_visible)}
+                    disabled={visibilitySavingId === item.item_id}
+                    className="rounded-lg border border-slate-700 px-3 py-1.5 hover:bg-slate-800 disabled:opacity-60"
+                  >
+                    {visibilitySavingId === item.item_id
+                      ? "Saving..."
+                      : item.public_visible
+                        ? "Hide public"
+                        : "Publish public"}
+                  </button>
+                ) : null}
                 {item.status === "ACTIVE" && role !== "STAFF" ? (
                   editingPriceId === item.item_id ? (
                     <div className="flex items-center gap-2">
