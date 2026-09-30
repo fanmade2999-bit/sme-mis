@@ -51,6 +51,7 @@ export async function updateSession(request: NextRequest) {
       .from("staff_account")
       .select("account_id")
       .eq("auth_user_id", userId)
+      .eq("is_active", true)
       .maybeSingle();
 
     if (pathname.startsWith("/dashboard") && !account) {
