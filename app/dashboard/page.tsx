@@ -74,6 +74,7 @@ export default async function DashboardPage() {
                 Staff
               </a>
             ) : null}
+            <a href="/dashboard/catalog" className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">Catalog</a>
             <a href="/dashboard/analytics" className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">
               Analytics
             </a>
@@ -107,6 +108,11 @@ export default async function DashboardPage() {
         </section>
 
         <section className="mt-6 grid gap-4 md:grid-cols-3">
+          <a href="/dashboard/catalog" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
+            <p className="text-sm text-emerald-400">Catalog</p>
+            <h2 className="mt-1 text-lg font-semibold">Manage products & items</h2>
+            <p className="mt-2 text-sm text-slate-500">Create listings, categories, prices, and audited opening stock.</p>
+          </a>
           <a href="/dashboard/analytics" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Analytics</p>
             <h2 className="mt-1 text-lg font-semibold">View MIS reporting</h2>
