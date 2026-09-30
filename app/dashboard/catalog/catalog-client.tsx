@@ -56,6 +56,9 @@ export function CatalogClient({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [creating, setCreating] = useState(false);
+  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
+  const [editingPrice, setEditingPrice] = useState("");
+  const [priceSaving, setPriceSaving] = useState(false);
 
   async function addCategory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -80,6 +83,65 @@ export function CatalogClient({
     setCategoryId(data.category_id);
     setCategoryName("");
     setMessage("Category created.");
+    router.refresh();
+  }
+
+  async function changePrice(itemId: string) {
+    setError("");
+    setMessage("");
+    setPriceSaving(true);
+
+    const nextPrice = Number(editingPrice);
+    if (!Number.isFinite(nextPrice) || nextPrice < 0) {
+      setError("Price must be zero or greater.");
+      setPriceSaving(false);
+      return;
+    }
+
+    const { data, error: priceError } = await supabase.rpc("set_item_price", {
+      p_item_id: itemId,
+      p_new_price: nextPrice,
+    });
+
+    if (priceError) {
+      setError(priceError.message);
+      setPriceSaving(false);
+      return;
+    }
+
+    setItems((current) =>
+      current.map((item) =>
+        item.item_id === itemId
+          ? { ...item, current_price: Number(data.current_price) }
+          : item,
+      ),
+    );
+    setEditingPriceId(null);
+    setEditingPrice("");
+    setMessage("Price updated and change logged.");
+    setPriceSaving(false);
+    router.refresh();
+  }
+
+  async function archive(itemId: string) {
+    setError("");
+    setMessage("");
+
+    const { error: archiveError } = await supabase.rpc("archive_item", {
+      p_item_id: itemId,
+    });
+
+    if (archiveError) {
+      setError(archiveError.message);
+      return;
+    }
+
+    setItems((current) =>
+      current.map((item) =>
+        item.item_id === itemId ? { ...item, status: "ARCHIVED" } : item,
+      ),
+    );
+    setMessage("Item archived. Historical movements remain intact.");
     router.refresh();
   }
 
@@ -250,7 +312,63 @@ export function CatalogClient({
                   {item.current_price.toLocaleString("en-PH", { style: "currency", currency: "PHP" })} · {item.stock_qty} in stock · reorder {item.reorder_level}
                 </p>
               </div>
-              <div className="text-sm text-slate-500">{item.status}</div>
+              <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                <span>{item.status}</span>
+                {item.status === "ACTIVE" && role !== "STAFF" ? (
+                  editingPriceId === item.item_id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={editingPrice}
+                        onChange={(event) => setEditingPrice(event.target.value)}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        className="w-28 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-slate-100"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => changePrice(item.item_id)}
+                        disabled={priceSaving}
+                        className="rounded-lg bg-emerald-500 px-3 py-1.5 font-medium text-slate-950 disabled:opacity-60"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingPriceId(null);
+                          setEditingPrice("");
+                        }}
+                        className="rounded-lg border border-slate-700 px-3 py-1.5"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingPriceId(item.item_id);
+                          setEditingPrice(String(item.current_price));
+                        }}
+                        className="rounded-lg border border-slate-700 px-3 py-1.5 hover:bg-slate-800"
+                      >
+                        Change price
+                      </button>
+                      {role === "OWNER" ? (
+                        <button
+                          type="button"
+                          onClick={() => archive(item.item_id)}
+                          className="rounded-lg border border-red-900 px-3 py-1.5 text-red-300 hover:bg-red-950/40"
+                        >
+                          Archive
+                        </button>
+                      ) : null}
+                    </>
+                  )
+                ) : null}
+              </div>
             </article>
           ))}
           {items.length === 0 ? <p className="p-6 text-sm text-slate-500">No items yet.</p> : null}
