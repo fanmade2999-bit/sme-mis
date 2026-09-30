@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function SetupPage() {
   const router = useRouter();
-  const supabase = createClient();
   const [fullName, setFullName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [error, setError] = useState("");
@@ -14,6 +13,7 @@ export default function SetupPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const supabase = createClient();
     setError("");
     setLoading(true);
 
