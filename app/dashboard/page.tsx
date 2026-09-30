@@ -111,19 +111,21 @@ export default async function DashboardPage() {
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           <a href="/dashboard/catalog" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Catalog</p>
-            <h2 className="mt-1 text-lg font-semibold">Manage products & items</h2>
-            <p className="mt-2 text-sm text-slate-500">Create listings, categories, prices, and audited opening stock.</p>
+            <h2 className="mt-1 text-lg font-semibold">{account.role === "STAFF" ? "View products & items" : "Manage products & items"}</h2>
+            <p className="mt-2 text-sm text-slate-500">{account.role === "STAFF" ? "View the current SME catalog and stock levels." : "Create listings, categories, prices, and audited opening stock."}</p>
           </a>
           <a href="/dashboard/analytics" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Analytics</p>
             <h2 className="mt-1 text-lg font-semibold">View MIS reporting</h2>
             <p className="mt-2 text-sm text-slate-500">Sales, inventory, price freshness, and Owner margin coverage.</p>
           </a>
-          <a href="/dashboard/staff" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
-            <p className="text-sm text-emerald-400">Access</p>
-            <h2 className="mt-1 text-lg font-semibold">Manage staff</h2>
-            <p className="mt-2 text-sm text-slate-500">Owner-only invitations, role changes, and revocation.</p>
-          </a>
+          {account.role === "OWNER" ? (
+            <a href="/dashboard/staff" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
+              <p className="text-sm text-emerald-400">Access</p>
+              <h2 className="mt-1 text-lg font-semibold">Manage staff</h2>
+              <p className="mt-2 text-sm text-slate-500">Owner-only invitations, role changes, and revocation.</p>
+            </a>
+          ) : null}
           <Link href="/" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Public</p>
             <h2 className="mt-1 text-lg font-semibold">Public price layer</h2>
