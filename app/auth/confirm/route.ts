@@ -7,7 +7,11 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? (type === "invite" ? "/auth/invite" : "/");
+  const requestedNext = searchParams.get("next");
+  const fallbackNext = type === "invite" ? "/auth/invite" : "/";
+  const next = requestedNext && requestedNext.startsWith("/") && !requestedNext.startsWith("//")
+    ? requestedNext
+    : fallbackNext;
 
   if (token_hash && (type === "email" || type === "invite")) {
     const supabase = await createClient();
