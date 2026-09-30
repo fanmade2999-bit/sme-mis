@@ -67,7 +67,7 @@ jobs:
 
       - name: Link Vercel project
         if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 link --yes --project="$VERCEL_PROJECT_ID" --token="$VERCEL_TOKEN"
+        run: npx --yes vercel@58.4.4 link --yes --project="$VERCEL_PROJECT_ID" --scope="fanmade1" --token="$VERCEL_TOKEN"
 
       - name: Pull Vercel production environment
         if: steps.credential.outputs.configured == 'true'
