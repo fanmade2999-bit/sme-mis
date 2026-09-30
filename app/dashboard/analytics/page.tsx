@@ -2,6 +2,41 @@ import { redirect } from "next/navigation";
 import { getCurrentStaffAccount } from "@/lib/mis/current-user";
 import { createClient } from "@/lib/supabase/server";
 
+type SalesRow = {
+  sales_date: string;
+  sold_qty: number | null;
+  sales_value: number | null;
+};
+
+type InventoryRow = {
+  item_id: string;
+  product_name: string;
+  stock_qty: number;
+  reorder_level: number;
+  is_low_stock: boolean;
+  inventory_retail_value: number | null;
+};
+
+type FreshnessRow = {
+  item_id: string;
+  product_name: string;
+  current_price: number;
+  price_updated_at: string;
+  days_since_price_update: number;
+  is_stale: boolean;
+};
+
+type ProfitRow = {
+  sales_date: string;
+  item_id: string;
+  product_id: string;
+  product_name: string;
+  sold_qty: number;
+  sales_value: number;
+  cost_coverage: number;
+  gross_profit: number | null;
+};
+
 function formatMoney(value: number | null | undefined) {
   if (value == null) return "Unavailable";
   return new Intl.NumberFormat("en-PH", {
@@ -52,10 +87,10 @@ export default async function AnalyticsPage() {
   if (freshness.error) throw new Error(freshness.error.message);
   if (profit.error) throw new Error(profit.error.message);
 
-  const salesRows = sales.data ?? [];
-  const inventoryRows = inventory.data ?? [];
-  const freshnessRows = freshness.data ?? [];
-  const profitRows = profit.data ?? [];
+  const salesRows = (sales.data ?? []) as SalesRow[];
+  const inventoryRows = (inventory.data ?? []) as InventoryRow[];
+  const freshnessRows = (freshness.data ?? []) as FreshnessRow[];
+  const profitRows = (profit.data ?? []) as ProfitRow[];
 
   const salesValue = salesRows.reduce((sum, row) => sum + Number(row.sales_value ?? 0), 0);
   const soldQty = salesRows.reduce((sum, row) => sum + Number(row.sold_qty ?? 0), 0);
