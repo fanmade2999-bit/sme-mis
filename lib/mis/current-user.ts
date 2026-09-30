@@ -30,11 +30,10 @@ export async function getCurrentStaffAccount(): Promise<StaffAccountSummary | nu
 
   if (!userData.user) return null;
 
+  // auth_user_id is intentionally not readable by the authenticated Data API role.
+  // Resolve the current account through the guarded read-only RPC instead.
   const { data, error } = await supabase
-    .from("staff_account")
-    .select("account_id, sme_id, first_name, middle_name, last_name, name_suffix, role, is_active")
-    .eq("auth_user_id", userData.user.id)
-    .eq("is_active", true)
+    .rpc("get_current_staff_account")
     .maybeSingle();
 
   if (error) {
