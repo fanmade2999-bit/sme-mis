@@ -23,8 +23,15 @@ begin
   if to_regprocedure('public.record_stock_movement(uuid,public.stock_movement_type,integer,public.correction_direction,text)') is null then
     raise exception 'Stock movement contract is missing';
   end if;
+  if pg_get_function_result(to_regprocedure('public.record_stock_movement(uuid,public.stock_movement_type,integer,public.correction_direction,text)')) <> 'jsonb' then
+    raise exception 'Stock movement must return a safe jsonb contract';
+  end if;
   if to_regprocedure('public.set_item_price(uuid,numeric)') is null then
     raise exception 'Price transaction contract is missing';
+  end if;
+  if to_regprocedure('public.set_item_price(uuid,numeric)') is not null and
+     pg_get_function_result(to_regprocedure('public.set_item_price(uuid,numeric)')) <> 'jsonb' then
+    raise exception 'Price transaction must return a safe jsonb contract';
   end if;
   if to_regprocedure('public.set_item_cost(uuid,numeric)') is null then
     raise exception 'Cost transaction contract is missing';
