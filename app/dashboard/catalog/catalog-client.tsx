@@ -46,13 +46,11 @@ function canonicalKey(parts: string[]) {
 }
 
 export function CatalogClient({
-  smeId,
   role,
   initialCategories,
   initialLocations,
   initialItems,
 }: {
-  smeId: string;
   role: Role;
   initialCategories: Category[];
   initialLocations: Location[];
@@ -65,9 +63,7 @@ export function CatalogClient({
 
   const [categoryName, setCategoryName] = useState("");
   const [showCategoryCreate, setShowCategoryCreate] = useState(false);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(
-    initialCategories[0] ? [initialCategories[0].category_id] : [],
-  );
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 
   const [brand, setBrand] = useState("");
   const [productName, setProductName] = useState("");
@@ -346,7 +342,7 @@ export function CatalogClient({
     setInitialStock("");
     setShelfLocationId("");
     setQrCode("");
-    setSelectedCategoryIds(categories[0] ? [categories[0].category_id] : []);
+    setSelectedCategoryIds([]);
     setMessage("Item created.");
     setCreating(false);
     router.refresh();
