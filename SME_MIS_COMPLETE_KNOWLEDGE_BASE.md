@@ -1374,7 +1374,7 @@ Function:
 Current live state:
 
 - status: ACTIVE;
-- version: 3;
+- version: 4;
 - browser CORS support;
 - explicit authenticated-token validation;
 - gateway verify_jwt disabled;
@@ -1753,7 +1753,7 @@ Current behavior:
 - business name;
 - observed range;
 - listing count;
-- freshness-related information.
+- price freshness timestamp.
 
 The page is configured to be dynamic so runtime Supabase data is not required during static build.
 
@@ -2327,7 +2327,8 @@ Implemented:
 - catalog entry;
 - stock workspace;
 - analytics access;
-- Owner-only staff-management access.
+- Owner-only staff-management access;
+- Owner public-listing enable/disable control.
 
 ## Catalog
 
@@ -2717,30 +2718,24 @@ Confirmed Supabase migration versions include:
 - 20260930192112 secure_catalog_category_creation
 - 20260930192313 index_item_category_item_fk
 
-The staff-name normalization and reactivation changes were applied directly during iterative work and later recorded in a GitHub migration file. They still require migration-history reconciliation.
+The staff-name normalization and reactivation state has now been reconciled into live migration history as:
 
----
+    20260930211319_normalize_staff_names_and_restore_access
 
-# 86. Repository migration caveat
+The repository now carries that exact migration version, and the earlier unrecorded 20261001034500 normalization file was removed.
 
-A direct-SQL change can make production schema newer than the formal migration history.
+One historical caveat remains:
 
-Current known caveat:
+- Supabase contains two entries named harden_owner_checks_and_drop_legacy_bootstrap:
+  20260930202902 and 20260930210747.
+- The repository now contains the later applied version 20260930210747.
+- The exact original SQL for the earlier 20260930202902 entry was not recovered from repository history.
 
-- normalized staff-name fields;
-- dropping old full_name;
-- new normalized bootstrap function;
-- reactivate_staff_account.
-
-Repository file created:
-
-    supabase/migrations/20261001034500_normalize_staff_names_and_restore_access.sql
-
-But the migration-history list checked during this session did not yet show that version.
+The later hardening migration is idempotent, so the duplicate live application does not change the final function behavior.
 
 Therefore:
 
-> Do not claim that a completely fresh migration replay is guaranteed to reproduce the current production database until the history is reconciled.
+> The live schema is verified in its current state, but exact byte-for-byte historical replay is still not guaranteed until the original 20260930202902 migration source is recovered or formally reconstructed.
 
 ---
 
