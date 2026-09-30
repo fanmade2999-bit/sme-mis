@@ -20,10 +20,9 @@ export async function setPublicListingEnabled(formData: FormData) {
   const enabled = formData.get("enabled") === "true";
   const supabase = await createClient();
 
-  const { error } = await supabase
-    .from("sme")
-    .update({ public_listing_enabled: enabled })
-    .eq("sme_id", account.sme_id);
+  const { error } = await supabase.rpc("set_sme_public_listing", {
+    p_enabled: enabled,
+  });
 
   if (error) throw new Error(error.message);
 
