@@ -533,6 +533,12 @@ Not intended to:
 - manage staff accounts;
 - edit item cost.
 
+Item-level public visibility:
+
+- Owner/Manager can choose whether an active item appears in public comparison.
+- SME-level public listing and item-level visibility are both required for a listing to appear.
+- Public visibility changes use set_item_public_visibility(item_id, public_visible).
+
 ## Staff
 
 Frontline operational role.
@@ -1585,7 +1591,7 @@ UI hiding is not sufficient security.
 
 Authenticated users can select their current SME.
 
-Owner can update permitted SME settings only through the guarded public-listing RPC in the current implementation.
+Owner can change public-listing participation only through the guarded public-listing RPC in the current implementation.
 
 Public can read active public-participating SMEs.
 
@@ -1651,6 +1657,15 @@ RLS answers:
 Both must be designed.
 
 The staff_account grants were explicitly updated so the authenticated role can read the normalized name fields and required membership data.
+
+## 45.1 Least-privilege grants
+
+Current direct write policy is intentionally narrow:
+
+- authenticated users do not receive direct UPDATE/INSERT/DELETE access for operational business mutations;
+- item/category/public-setting mutations go through guarded RPCs;
+- public anonymous access is limited to the public price comparison views and the minimum underlying columns needed by those security-invoker views;
+- reporting views are SELECT-only.
 
 ---
 
