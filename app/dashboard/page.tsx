@@ -76,6 +76,7 @@ export default async function DashboardPage() {
               </a>
             ) : null}
             <a href="/dashboard/catalog" className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">Catalog</a>
+            <a href="/dashboard/stock" className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">Stock</a>
             <a href="/dashboard/analytics" className="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">
               Analytics
             </a>
@@ -108,11 +109,16 @@ export default async function DashboardPage() {
           </article>
         </section>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-3">
+        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <a href="/dashboard/catalog" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Catalog</p>
             <h2 className="mt-1 text-lg font-semibold">{account.role === "STAFF" ? "View products & items" : "Manage products & items"}</h2>
             <p className="mt-2 text-sm text-slate-500">{account.role === "STAFF" ? "View the current SME catalog and stock levels." : "Create listings, categories, prices, and audited opening stock."}</p>
+          </a>
+          <a href="/dashboard/stock" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
+            <p className="text-sm text-emerald-400">Stock</p>
+            <h2 className="mt-1 text-lg font-semibold">Record stock movement</h2>
+            <p className="mt-2 text-sm text-slate-500">Sales, restocks, losses, spoilage, and corrections with staff attribution.</p>
           </a>
           <a href="/dashboard/analytics" className="rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-700">
             <p className="text-sm text-emerald-400">Analytics</p>
