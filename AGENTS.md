@@ -21,6 +21,15 @@ SME MIS is a multi-tenant SME management information system built with Next.js A
 - Invite/revocation/reactivation flows must handle missing Auth users safely.
 - Never use editable user metadata for authorization.
 
+## Git workflow
+- Never implement a feature directly on `main` unless it is an emergency hotfix.
+- Create one focused branch per feature/fix, using a descriptive name such as `feat/catalog-search`, `fix/stock-validation`, or `chore/ci-hardening`.
+- Keep a branch scoped to one coherent change. Do not mix unrelated refactors or features.
+- Open a pull request into `main` when the branch is ready.
+- CI must pass before merge. Review the diff for behavior, security, tests, and scope before approving.
+- Merge only after approval and green required checks. Production deployment occurs from the resulting `main` commit.
+- Do not force-push or rewrite shared history as part of ordinary feature work.
+
 ## Development loop
 1. Work on one focused branch/task.
 2. Read the relevant code, migration, and current tests before editing.
