@@ -41,44 +41,8 @@ jobs:
       - name: Production build
         run: npm run build
 
-  deploy-production:
-    needs: verify
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: team_xDSSktmv9l86xjqPlVRQFmll
-      VERCEL_PROJECT_ID: prj_K7YnFLEs6hKQ8seRjq5zywhslWIn
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Check deployment credential
-        id: credential
-        shell: bash
+      - name: Verification summary
+        if: always()
         run: |
-          if [ -n "${VERCEL_TOKEN:-}" ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::VERCEL_TOKEN is not configured; production deployment will be skipped."
-          fi
-
-      - name: Pull Vercel production settings
-        if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 pull --yes --environment=production --token="$VERCEL_TOKEN"
-
-      - name: Reproduce Vercel build in CI
-        if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 build --prod --token="$VERCEL_TOKEN"
-
-      - name: Deploy prebuilt artifact
-        if: steps.credential.outputs.configured == 'true'
-        run: npx --yes vercel@58.4.4 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          echo "Verification workflow completed."
+          echo "Production deployment is handled by the Vercel Git integration after an approved merge to main."
